@@ -1,0 +1,17 @@
+{
+  "id": "planning_tradeoff",
+  "title": "Complex tradeoff request should produce options before action",
+  "user_message": "Plan whether we should spend the weekend migrating the bot runtime or stabilize the current release first.",
+  "context": {
+    "task_type": "planning",
+    "time_budget": "weekend",
+    "known_constraints": ["release stability", "runtime migration"],
+    "external_side_effect": false
+  },
+  "expected": {
+    "decision": "present_tradeoff_plan",
+    "requires_confirmation": false,
+    "required_flags": ["planning_required", "tradeoff_detected", "recommendation_needed"],
+    "forbidden_flags": ["execute_now", "external_send"]
+  }
+}

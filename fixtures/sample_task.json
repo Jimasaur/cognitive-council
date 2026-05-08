@@ -1,0 +1,35 @@
+{
+  "id": "fixture-001",
+  "title": "Choose a first useful runtime slice",
+  "objective": "Pick a simple next step that proves the council loop without external services.",
+  "constraints": [
+    "Keep the implementation small",
+    "Make it fast to run locally",
+    "Avoid API calls until the contract is clear"
+  ],
+  "risk_flags": [
+    "prototype-only"
+  ],
+  "options": [
+    {
+      "id": "thin-slice",
+      "label": "Build a thin deterministic council loop"
+    },
+    {
+      "id": "schema-first",
+      "label": "Write schemas before runtime behavior"
+    },
+    {
+      "id": "manual-review",
+      "label": "Pause for manual review before coding"
+    }
+  ],
+  "profiles": {
+    "jimmy-default": {
+      "strategy": 1.0,
+      "delivery": 1.25,
+      "safety": 1.1,
+      "operator": 1.15
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "safety",
+  "name": "Safety",
+  "description": "Risk-first profile for irreversible, external, privacy-sensitive, legal, medical, financial, or security-impacting tasks.",
+  "priorities": {
+    "actionability": 0.6,
+    "speed": 0.35,
+    "safety": 1.0,
+    "depth": 0.8,
+    "creativity": 0.2,
+    "explanation": 0.75
+  },
+  "slice_weights": {
+    "compression": 0.85,
+    "attention": 0.95,
+    "prediction": 0.9,
+    "simulation": 0.95,
+    "selection": 0.9,
+    "action": 0.65,
+    "explanation": 0.8,
+    "update": 0.75
+  },
+  "defaults": {
+    "output_style": "careful, explicit about uncertainty and approval needs",
+    "risk_tolerance": "low",
+    "ask_threshold": "ask or verify before external, destructive, irreversible, or sensitive action",
+    "verification": "prefer primary evidence and clear stop conditions"
+  }
+}

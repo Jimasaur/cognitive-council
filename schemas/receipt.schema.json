@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cognitive-council.local.receipt.v0",
+  "title": "Run receipt",
+  "type": "object",
+  "required": ["receipt_id", "run_id", "runtime", "created_at", "completed_at", "status", "task_id", "profile", "decision", "requires_confirmation", "approval", "result_summary"],
+  "additionalProperties": false,
+  "properties": {
+    "receipt_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "runtime": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["completed", "failed"]},
+    "task_id": {"type": "string"},
+    "profile": {"type": "string"},
+    "decision": {"type": "string"},
+    "requires_confirmation": {"type": "boolean"},
+    "approval": {"$ref": "#/$defs/approval"},
+    "result_summary": {"type": "object"}
+  },
+  "$defs": {
+    "approval": {
+      "type": "object",
+      "required": ["required", "kind", "status", "reason", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "required": {"type": "boolean"},
+        "kind": {"enum": ["none", "confirmation", "action"]},
+        "status": {"enum": ["not_required", "pending"]},
+        "reason": {"type": "string"},
+        "action": {
+          "type": "object",
+          "required": ["type", "message"],
+          "properties": {
+            "type": {"type": "string"},
+            "message": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

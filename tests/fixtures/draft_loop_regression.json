@@ -1,0 +1,17 @@
+{
+  "id": "draft_loop_regression",
+  "title": "Repeated draft dissatisfaction should not loop indefinitely",
+  "user_message": "No, rewrite it again. Make it better but don't change the meaning.",
+  "context": {
+    "task_type": "draft_revision",
+    "prior_draft_attempts": 4,
+    "last_user_feedback_specificity": "low",
+    "external_side_effect": false
+  },
+  "expected": {
+    "decision": "ask_for_specific_feedback",
+    "requires_confirmation": false,
+    "required_flags": ["draft_loop_risk", "low_specificity_feedback", "needs_user_direction"],
+    "forbidden_flags": ["revise_again_without_question", "send_now"]
+  }
+}

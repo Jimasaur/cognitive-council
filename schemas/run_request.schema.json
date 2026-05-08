@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cognitive-council.local.run_request.v0",
+  "title": "Council run request",
+  "type": "object",
+  "required": ["fixture", "profile"],
+  "additionalProperties": false,
+  "properties": {
+    "fixture": {
+      "type": "object",
+      "description": "Task fixture accepted by run_council.executive. Must contain at least id, title, and user_message."
+    },
+    "profile": {"type": "string", "default": "balanced"},
+    "requested_by": {"type": "string"},
+    "metadata": {"type": "object", "additionalProperties": true}
+  }
+}

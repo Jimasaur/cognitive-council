@@ -1,0 +1,29 @@
+{
+  "id": "balanced",
+  "name": "Balanced",
+  "description": "Default profile balancing execution, safety, reasoning depth, and concise user communication.",
+  "priorities": {
+    "actionability": 0.8,
+    "speed": 0.65,
+    "safety": 0.85,
+    "depth": 0.7,
+    "creativity": 0.5,
+    "explanation": 0.7
+  },
+  "slice_weights": {
+    "compression": 0.9,
+    "attention": 0.85,
+    "prediction": 0.75,
+    "simulation": 0.75,
+    "selection": 0.85,
+    "action": 0.85,
+    "explanation": 0.7,
+    "update": 0.65
+  },
+  "defaults": {
+    "output_style": "direct, practical, concise",
+    "risk_tolerance": "moderate_with_safety_checks",
+    "ask_threshold": "make reasonable assumptions unless safety or correctness would suffer",
+    "verification": "use an appropriate lightweight check before finalizing"
+  }
+}

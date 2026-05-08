@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cognitive-council.local.run_record.v0",
+  "title": "Council run record",
+  "type": "object",
+  "required": ["run_id", "status", "created_at", "updated_at", "request", "result", "receipt"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {"type": "string"},
+    "status": {"enum": ["queued", "running", "completed", "failed"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "request": {"$ref": "run_request.schema.json"},
+    "result": {"$ref": "council_result.schema.json"},
+    "receipt": {"$ref": "receipt.schema.json"},
+    "error": {"type": ["string", "null"]}
+  }
+}

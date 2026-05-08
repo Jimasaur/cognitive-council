@@ -1,0 +1,26 @@
+{
+  "id": "meta_intelligence_design",
+  "title": "Design a modular meta-intelligence platform",
+  "user_message": "Can we mesh modern frontier agents into a kind of meta-intelligence: a bot for each cognitive slice and an ego bot that synthesizes it all?",
+  "objective": "Decide the next safe prototype step for the Cognitive Council experiment.",
+  "context": {
+    "task_type": "planning",
+    "external_side_effect": false,
+    "known_constraints": [
+      "Keep deterministic contract tests intact",
+      "Add real model calls one slice at a time",
+      "Do not deploy or send external messages from this experiment"
+    ]
+  },
+  "constraints": [
+    "Prefer a small runnable prototype over a grand architecture document",
+    "Preserve JSON contracts for slice outputs",
+    "Make profile weighting observable"
+  ],
+  "expected": {
+    "decision": "present_tradeoff_plan",
+    "requires_confirmation": false,
+    "required_flags": ["planning_required", "tradeoff_detected", "recommendation_needed"],
+    "forbidden_flags": ["external_send", "financial_risk", "adversarial_urgency"]
+  }
+}
