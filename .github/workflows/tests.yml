@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install API test dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run deterministic contract fixtures
+        run: python3 tests/run_contract.py
+      - name: Run unittest suite
+        run: python3 -m unittest tests.test_runs_service tests.test_mock_runtime_contract
+      - name: Compile main modules
+        run: python3 -m py_compile run_council.py compare_profiles.py llm_adapter.py runs_service.py schemas.py server.py

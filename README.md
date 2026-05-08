@@ -1,27 +1,62 @@
-# Cognitive Council Runtime Scaffold
+# Cognitive Council
 
-A tiny local scaffold for a future Cognitive Council Runtime.
+A tiny runtime for modular agentic cognition: slice judgments, executive synthesis, approval gates, and receipts.
 
-The convergence path with the local Agent Runtime Lab is documented in [`docs/runtime-api.md`](docs/runtime-api.md). It sketches `POST /runs`, `GET /runs/{id}`, approval objects, receipts, deterministic vs model-backed slices, and future Mercury/Leo caller patterns.
+## Core idea
 
-Current behavior:
+**Methods are many; mechanisms are few.**
 
-- Loads a JSON task fixture.
-- Runs deterministic mock slice agents for the eight cognitive slices: compression, attention, prediction, simulation, selection, action, explanation, update.
-- Applies profile weights.
-- Emits an executive JSON decision.
-- Provides a synchronous, file-backed local `/runs` service contract (`runs_service.py`) that creates completed run records and receipts without starting a server.
-- Documents and validates run request, run record, council result, and receipt shapes with stdlib validators plus schema-like JSON docs under `schemas/`.
-- Makes no network calls by default and uses only the Python standard library.
-- Optionally replaces one slice with an OpenAI Responses API call via `--llm-slice`, preserving the same JSON contract.
+Cognitive Council explores whether useful agent behavior can be decomposed into a small set of recurring motifs:
 
-## Run
+1. compression
+2. attention
+3. prediction
+4. simulation
+5. selection
+6. action
+7. explanation
+8. update
+
+Each motif is represented as a cognitive slice. The executive layer weighs slice outputs through a profile and returns one structured decision with confidence, flags, top influences, approval state, and a receipt.
+
+## Current status
+
+This repo is a local, deterministic v0 prototype.
+
+It currently includes:
+
+- `run_council.py` — CLI council runner
+- `compare_profiles.py` — profile comparison helper
+- `server.py` — local FastAPI `/runs` wrapper
+- `runs_service.py` — filesystem-backed local run service
+- `schemas.py` + `schemas/*.json` — validation and contract docs
+- `llm_adapter.py` — optional one-slice OpenAI Responses adapter
+- `tests/fixtures/*.json` — deterministic regression fixtures
+- `docs/runtime-api.md` — canonical local runtime API contract
+- `docs/handoff.md` — quick resume guide
+- `docs/loose-ends.md` — parked work for the next session
+- `ROADMAP.md` — short forward path
+- `CONTINUITY.md` — project continuity notes
+
+By default it makes **no network calls** and uses deterministic local slice logic.
+
+## Install
+
+The core CLI uses only the Python standard library. The local API/tests use FastAPI/TestClient dependencies from `requirements.txt`.
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+## Run the council
+
+Default sample fixture:
 
 ```bash
 python3 run_council.py --pretty
 ```
 
-Use a specific fixture and profile:
+Specific fixture and profile:
 
 ```bash
 python3 run_council.py tests/fixtures/planning_tradeoff.json --profile strategist --pretty
@@ -33,72 +68,112 @@ Compare profiles:
 python3 compare_profiles.py tests/fixtures/meta_intelligence_design.json --pretty
 ```
 
-Run one real model-backed slice, if `OPENAI_API_KEY` is available:
+## Run tests
 
-```bash
-python3 run_council.py tests/fixtures/meta_intelligence_design.json --profile strategist --llm-slice simulation --pretty
-```
-
-Built-in / local profiles are `balanced`, `operator`, `safety`, and `strategist`.
-
-Run no-dependency contract tests, including local `/runs` create/get/receipt checks:
+Deterministic contract fixtures:
 
 ```bash
 python3 tests/run_contract.py
 ```
 
-Run only the `/runs` service tests:
+Service/API tests:
 
 ```bash
-python3 tests/test_runs_service.py
+python3 -m unittest tests.test_runs_service tests.test_mock_runtime_contract
 ```
 
-## Local API
-
-Install the small API dependencies, then run the service bound to localhost:
+Compile check:
 
 ```bash
-python3 -m pip install -r requirements.txt
+python3 -m py_compile run_council.py compare_profiles.py llm_adapter.py runs_service.py schemas.py server.py
+```
+
+## Local `/runs` API
+
+Run the local API on loopback only:
+
+```bash
 uvicorn server:app --host 127.0.0.1 --port 8765
 ```
 
-Create a deterministic local run from a fixture:
+Health check:
+
+```bash
+curl -s http://127.0.0.1:8765/health
+```
+
+Create a deterministic run from a fixture:
 
 ```bash
 curl -s http://127.0.0.1:8765/runs \
   -H 'content-type: application/json' \
-  -d '{"fixture":"tests/fixtures/quick_send.json","profile":"balanced"}'
+  -d '{"fixture":"tests/fixtures/quick_send.json","profile":"operator"}'
 ```
 
-Or pass inline task JSON with `task`. Runs are stored as JSON under `.runs/` and can be fetched with `GET /runs/{id}`. No model call is made unless `llm_slice` is explicitly provided.
+Fetch a run:
 
-## Fixture shape
+```bash
+curl -s http://127.0.0.1:8765/runs/<run_id>
+```
 
-Required keys:
+Runs are stored locally under `.runs/`, which is gitignored.
 
-- `id`
-- `title`
-- `objective`
-- `options` with each option containing `id` and `label`
+Canonical run records include:
 
-Optional keys:
+- `run_id`
+- `status`
+- `request`
+- `result`
+- `receipt`
+- `receipt.approval`
 
-- `constraints`
-- `risk_flags`
-- `profiles`
+## Optional model-backed slice
 
-## Local `/runs` contract
+A model-backed slice is opt-in and should replace exactly one slice at a time.
 
-`runs_service.LocalRunsService` is the no-network contract target for a future HTTP endpoint:
+Example, if `OPENAI_API_KEY` is available:
 
-- `create_run(request)` accepts `{fixture, profile, requested_by?, metadata?}`.
-- It runs the deterministic local council synchronously.
-- It persists and returns a completed run record with `result` and `receipt`.
-- `get_run(run_id)` retrieves and validates the stored record.
-- Receipt `approval` objects always have `{required, kind, status, reason, action}`.
+```bash
+python3 run_council.py tests/fixtures/meta_intelligence_design.json \
+  --profile strategist \
+  --llm-slice simulation \
+  --pretty
+```
 
-## Next obvious extensions
+Recommended model-backed order:
 
-- Move slice agents into separate modules once behavior grows.
-- Add schema docs for fixture inputs if the fixture contract expands.
-- Replace mock slice agents with real agent adapters only after the contract is stable.
+```text
+simulation → prediction → explanation → selection
+```
+
+Avoid model-backed `action` until approval and receipt guarantees are much more mature.
+
+## Safety rules
+
+- Deterministic tests stay primary.
+- Model-backed slices are opt-in.
+- Model output must not bypass approval gates.
+- External side effects require explicit approval unless a separate, narrow, tested policy says otherwise.
+- This prototype should bind to `127.0.0.1` only.
+- Receipts should avoid secrets and broad duplication of private payloads.
+
+## Fixture outcomes
+
+Current deterministic fixtures are expected to resolve as follows:
+
+| Fixture | Decision |
+| --- | --- |
+| `adversarial_urgency` | `safety_hold` |
+| `draft_loop_regression` | `ask_for_specific_feedback` |
+| `email_ambiguity` | `ask_clarifying_question` |
+| `meta_intelligence_design` | `present_tradeoff_plan` |
+| `planning_tradeoff` | `present_tradeoff_plan` |
+| `quick_send` | `confirm_then_send` |
+
+## Docs
+
+- [Runtime API](docs/runtime-api.md)
+- [Handoff](docs/handoff.md)
+- [Loose Ends](docs/loose-ends.md)
+- [Roadmap](ROADMAP.md)
+- [Continuity](CONTINUITY.md)
