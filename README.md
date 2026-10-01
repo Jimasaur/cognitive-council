@@ -1,6 +1,8 @@
 # Cognitive Council
 
-A tiny runtime for modular agentic cognition: slice judgments, executive synthesis, approval gates, and receipts.
+A Python prototype for combining modular decision signals into a structured, reviewable result: slice judgments, executive synthesis, approval gates, and receipts.
+
+**Start here:** run the deterministic example below, inspect the returned decision, then explore the [runtime API contract](docs/runtime-api.md). The default path needs no API key.
 
 ## Core idea
 
